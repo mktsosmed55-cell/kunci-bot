@@ -1,11 +1,17 @@
+import os
+import logging
 from pymongo import MongoClient
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 
 # --- KONFIGURASI ---
-MONGO_URI = "mongodb+srv://mktsosmed55_db_user:ACILV0ZqBfqKANbU@mamabasah.amgjqtl.mongodb.net/?appName=MAMABASAH"
-TOKEN = "8223621284:AAEmWfgckgpHmebwaLNG5OZGKmEwOhdUMoc"
+# Menggunakan environment variable agar lebih aman dan tidak nyangkut di cache
+MONGO_URI = os.environ.get("MONGO_URI")
+TOKEN = os.environ.get("BOT_TOKEN")
 ADMIN_ID = 8765325815
+
+# --- LOGGING ---
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # --- KONEKSI DATABASE ---
 client = MongoClient(MONGO_URI)
@@ -50,9 +56,14 @@ async def handle_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"✅ Tersimpan di Cloud!\nLink: https://t.me/KoleksiVideoo_bot?start={new_id}")
 
 if __name__ == '__main__':
+    if not TOKEN or not MONGO_URI:
+        print("Error: BOT_TOKEN atau MONGO_URI belum diatur di Environment Variables!")
+        exit(1)
+        
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(check_verif, pattern="check_verif"))
     app.add_handler(MessageHandler(filters.VIDEO, handle_upload))
-    print("Bot sudah jalan dan terhubung ke MongoDB!")
+    
+    print("Bot berhasil jalan dan terhubung ke MongoDB!")
     app.run_polling()

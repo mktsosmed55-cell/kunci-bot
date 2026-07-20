@@ -3,12 +3,24 @@ import logging
 from pymongo import MongoClient
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
+from flask import Flask
+from threading import Thread
 
 # --- KONFIGURASI ---
-# Token dan URI diambil dari Environment Variables di Render
 MONGO_URI = "mongodb+srv://mktsosmed55_db_user:ACILV0ZqBfqKANbU@mamabasah.amgjqtl.mongodb.net/?appName=MAMABASAH"
 TOKEN = "8223621284:AAEmWfgckgpHmebwaLNG5OZGKmEwOhdUMoc"
 ADMIN_ID = 8765325815
+
+# --- SERVER PENGAMAN (Agar Render tidak error "No open ports") ---
+app_web = Flask(__name__)
+@app_web.route('/')
+def home():
+    return "Bot is active"
+
+def run_web():
+    app_web.run(host='0.0.0.0', port=10000)
+
+Thread(target=run_web).start()
 
 # --- LOGGING ---
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)

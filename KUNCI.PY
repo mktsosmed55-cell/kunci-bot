@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 
 # --- KONFIGURASI ---
 MONGO_URI = "mongodb+srv://mktsosmed55_db_user:ACILV0ZqBfqKANbU@mamabasah.amgjqtl.mongodb.net/?appName=MAMABASAH"
-TOKEN = "8223621284:AAEcXVj6JSHFXRJara-seM-zFnfx02TwVJ8"
+TOKEN = "8223621284:AAEmWfgckgpHmebwaLNG5OZGKmEwOhdUMoc"
 ADMIN_ID = 8765325815
 
 # --- KONEKSI DATABASE ---

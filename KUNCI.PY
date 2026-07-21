@@ -16,14 +16,22 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 client = MongoClient(MONGO_URI)
 db = client['bot_database']
 video_coll = db['videos']
+session_coll = db['user_sessions']  # Koleksi baru untuk menyimpan sesi permanen
 
 # --- FUNGSI ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
+    user_id = update.effective_user.id
+    
     if args and args[0].startswith("vid"):
         video_data = video_coll.find_one({"vid_id": args[0]})
         if video_data:
-            context.user_data['target_vid'] = video_data['file_id']
+            # Simpan secara permanen ke MongoDB berdasarkan User ID
+            session_coll.update_one(
+                {"user_id": user_id},
+                {"$set": {"target_vid": video_data['file_id']}},
+                upsert=True
+            )
             
     text = "✨ Selamat Datang! Klik tombol di bawah untuk verifikasi akses konten."
     keyboard = [
@@ -36,13 +44,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def check_verif(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    file_id = context.user_data.get('target_vid')
+    user_id = query.from_user.id
     
-    if file_id:
+    # Ambil data video dari MongoDB berdasarkan User ID
+    user_session = session_coll.find_one({"user_id": user_id})
+    
+    if user_session and "target_vid" in user_session:
+        file_id = user_session["target_vid"]
         await query.message.reply_video(video=file_id)
         await query.answer("✅ Berhasil!", show_alert=True)
     else:
-        await query.answer("❌ Link tidak valid atau sudah kadaluarsa.", show_alert=True)
+        await query.answer("❌ Silakan klik link /start dari video terlebih dahulu.", show_alert=True)
 
 async def handle_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID: return

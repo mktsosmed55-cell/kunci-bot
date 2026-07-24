@@ -46,6 +46,26 @@ async def check_verif(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
     
+    # --- SISTEM PENGECEKAN CHANNEL ---
+    required_channels = ["@susukentaltobrud", "@DINASTI138XMAMABASAH", "@BERUANGNYEPONG"]
+    is_verified = True
+    
+    for channel in required_channels:
+        try:
+            member = await context.bot.get_chat_member(chat_id=channel, user_id=user_id)
+            if member.status in ['left', 'kicked']:
+                is_verified = False
+                break
+        except Exception as e:
+            print(f"Error cek channel {channel}: {e}")
+            is_verified = False
+            break
+            
+    if not is_verified:
+        await query.answer("❌ Kamu belum join semua channel! Silakan join dulu.", show_alert=True)
+        return
+    # ---------------------------------
+    
     # Ambil data video dari MongoDB berdasarkan User ID
     user_session = session_coll.find_one({"user_id": user_id})
     

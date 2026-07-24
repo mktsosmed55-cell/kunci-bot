@@ -33,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 upsert=True
             )
             
-    text = "✨ Selamat Datang! Klik tombol di bawah untuk verifikasi akses konten."
+    text = "✨ Selamat Datang V2! Klik tombol di bawah untuk verifikasi akses konten."
     keyboard = [
         [InlineKeyboardButton("🔗 JOIN SUSU NASIONAL REBORN", url="https://t.me/susukentaltobrud")],
         [InlineKeyboardButton("🔗 JOIN DINASTI 138 X MAMA BASAH", url="https://t.me/DINASTI138XMAMABASAH")],
